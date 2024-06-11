@@ -13,4 +13,7 @@ lint:
 report:
 	./gradlew jacocoTestReport
 
+start:
+	./gradlew run
+
 .PHONY: build
