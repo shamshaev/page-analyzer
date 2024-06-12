@@ -5,11 +5,11 @@ import java.sql.Timestamp;
 public class Url {
     private Long id;
     private String name;
-    private Timestamp created_at;
+    private Timestamp createdAt;
 
-    public Url(String name, Timestamp created_at) {
+    public Url(String name, Timestamp createdAt) {
         this.name = name;
-        this.created_at = created_at;
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -28,11 +28,11 @@ public class Url {
         this.name = name;
     }
 
-    public Timestamp getCreated_at() {
-        return created_at;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(Timestamp created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }
