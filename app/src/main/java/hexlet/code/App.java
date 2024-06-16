@@ -2,12 +2,18 @@ package hexlet.code;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
+
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import io.javalin.rendering.template.JavalinJte;
+import gg.jte.resolve.ResourceCodeResolver;
 
 public class App {
     private static int getPort() {
@@ -28,6 +34,13 @@ public class App {
         return jdbcUrl.contains("h2") ? sql : sql.replace("AUTO_INCREMENT", "GENERATED ALWAYS AS IDENTITY");
     }
 
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        return templateEngine;
+    }
+
     public static Javalin getApp() throws SQLException {
 
         var hikariConfig = new HikariConfig();
@@ -39,11 +52,14 @@ public class App {
             statement.execute(getSql(getJdbcUrl()));
         }
 
+        BaseRepository.dataSource = dataSource;
+
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
-        app.get("/", ctx -> ctx.result("Hello World"));
+        app.get("/", ctx -> ctx.render("index.jte"));
 
         return app;
     }
