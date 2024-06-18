@@ -1,5 +1,8 @@
+@import hexlet.code.util.NamedRoutes
+@import hexlet.code.dto.BasePage
 @import gg.jte.Content
 @param Content content
+@param BasePage page = null
 
 <!doctype html>
 <html lang="ru">
@@ -13,23 +16,30 @@
     <header>
       <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Анализатор страниц</a>
+          <a class="navbar-brand" href="${NamedRoutes.rootPath()}">Анализатор страниц</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link" href="#">Главная</a>
+                <a class="nav-link" href="${NamedRoutes.rootPath()}">Главная</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Сайты</a>
+                <a class="nav-link" href="${NamedRoutes.urlsPath()}">Сайты</a>
               </li>
             </ul>
           </div>
         </div>
       </nav>
     </header>
+
+    @if(page != null && page.getFlash() != null)
+      <div class="alert alert-${page.getType(page.getFlash())} alert-dismissible mb-0" role="alert">
+        ${page.getFlash()}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
 
     <main>${content}</main>
 
