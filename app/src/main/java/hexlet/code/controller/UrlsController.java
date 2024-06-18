@@ -9,6 +9,7 @@ import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
+import org.postgresql.util.PSQLException;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -40,12 +41,12 @@ public class UrlsController {
             UrlRepository.save(url);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.redirect(NamedRoutes.urlsPath());
-        } catch (IllegalArgumentException | URISyntaxException | MalformedURLException ex) {
+        } catch (IllegalArgumentException | URISyntaxException | MalformedURLException e) {
             var page = new BasePage();
             ctx.sessionAttribute("flash", "Некорректный URL");
             page.setFlash(ctx.consumeSessionAttribute("flash"));
             ctx.render("index.jte", model("page", page));
-        } catch (JdbcSQLIntegrityConstraintViolationException e) {
+        } catch (JdbcSQLIntegrityConstraintViolationException | PSQLException e) {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.redirect(NamedRoutes.urlsPath());
         }
