@@ -7,14 +7,29 @@ import io.javalin.testtools.JavalinTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
 class AppTest {
     Javalin app;
+
+    private static Path getFixturePath(String fileName) {
+        return Paths.get("src", "test", "resources", "fixtures", fileName)
+                .toAbsolutePath().normalize();
+    }
+
+    private static String readFixture(String fileName) throws Exception {
+        Path filePath = getFixturePath(fileName);
+        return Files.readString(filePath).trim();
+    }
 
     @BeforeEach
     public final void setUp() throws SQLException {
@@ -61,6 +76,29 @@ class AppTest {
             assertThat(response.body().string()).contains("Сайт: https://www.example.com");
         });
     }
+
+    @Test
+    public void testCheckUrl() throws Exception {
+        MockWebServer server = new MockWebServer();
+        var body = readFixture("test.html");
+        MockResponse response = new MockResponse().setBody(body);
+        server.enqueue(response);
+        server.start();
+        var urlName = server.url("/").toString();
+
+        var url = new Url(urlName, Timestamp.valueOf("2024-06-19 12:06:22"));
+        UrlRepository.save(url);
+
+        JavalinTest.test(app, (serverAA, client) -> {
+            var responseAA = client.post("/urls/" + url.getId() + "/checks");
+            assertThat(responseAA.code()).isEqualTo(200);
+            assertThat(responseAA.body().string()).contains("Example Domain", "Correct Example Domain",
+                    "this one is for testing");
+        });
+
+        server.shutdown();
+    }
+
 
     @Test
     void testUrlNotFound() {

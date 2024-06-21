@@ -29,6 +29,10 @@ dependencies {
     implementation("gg.jte:jte:3.1.9")
     implementation("io.javalin:javalin-bundle:6.1.3")
     testImplementation("org.assertj:assertj-core:3.25.3")
+    implementation("com.konghq:unirest-java:4.0.0-RC2")
+    implementation("org.jsoup:jsoup:1.17.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
 }
 
 tasks.test {

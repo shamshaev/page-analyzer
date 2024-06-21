@@ -4,12 +4,17 @@ import hexlet.code.dto.BasePage;
 import hexlet.code.dto.urls.UrlPage;
 import hexlet.code.dto.urls.UrlsPage;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
-import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
-import org.postgresql.util.PSQLException;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -23,7 +28,8 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 public class UrlsController {
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
-        var page = new UrlsPage(urls);
+        var lastChecks = UrlCheckRepository.getLastChecks();
+        var page = new UrlsPage(urls, lastChecks);
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("urls/index.jte", model("page", page));
     }
@@ -35,33 +41,59 @@ public class UrlsController {
 
             var port = validatedName.getPort() != -1 ? ":" + validatedName.getPort() : "";
             var name = validatedName.getProtocol() + "://" + validatedName.getHost() + port;
-            var createdAt = Timestamp.valueOf(LocalDateTime.now());
 
-            var url = new Url(name, createdAt);
-            UrlRepository.save(url);
-            ctx.sessionAttribute("flash", "Страница успешно добавлена");
-            ctx.redirect(NamedRoutes.urlsPath());
+            if (UrlRepository.isDuplicate(name)) {
+                ctx.sessionAttribute("flash", "Страница уже существует");
+                ctx.redirect(NamedRoutes.urlsPath());
+            } else {
+                var createdAt = Timestamp.valueOf(LocalDateTime.now());
+                var url = new Url(name, createdAt);
+                UrlRepository.save(url);
+                ctx.sessionAttribute("flash", "Страница успешно добавлена");
+                ctx.redirect(NamedRoutes.urlsPath());
+            }
         } catch (IllegalArgumentException | URISyntaxException | MalformedURLException e) {
             var page = new BasePage();
             ctx.sessionAttribute("flash", "Некорректный URL");
             page.setFlash(ctx.consumeSessionAttribute("flash"));
             ctx.render("index.jte", model("page", page));
-        } catch (JdbcSQLIntegrityConstraintViolationException | PSQLException e) {
-            ctx.sessionAttribute("flash", "Страница уже существует");
-            ctx.redirect(NamedRoutes.urlsPath());
         }
     }
 
     public static void show(Context ctx) throws SQLException {
-        var id = ctx.pathParamAsClass("id", Long.class).get();
-        var url = UrlRepository.find(id)
-                .orElseThrow(() -> new NotFoundResponse("Post not found"));
-
-        var page = new UrlPage(url);
+        var urlId = ctx.pathParamAsClass("id", Long.class).get();
+        var url = UrlRepository.find(urlId)
+                .orElseThrow(() -> new NotFoundResponse("Url not found"));
+        var urlChecks = UrlCheckRepository.getEntitiesByUrlId(urlId);
+        var page = new UrlPage(url, urlChecks);
+        page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("urls/show.jte", model("page", page));
     }
 
+    public static void check(Context ctx) throws SQLException {
+        var urlId = ctx.pathParamAsClass("id", Long.class).get();
 
+        try {
+            var url = UrlRepository.find(urlId)
+                    .orElseThrow(() -> new NotFoundResponse("Url not found"));
+            HttpResponse<String> response = Unirest.get(url.getName()).asString();
+            var statusCode = response.getStatus();
+            Document doc = Jsoup.parse(response.getBody());
+            var title = doc.title();
+            var elementH1 = doc.selectFirst("h1");
+            var h1 = elementH1 != null ? elementH1.text() : null;
+            var elementDescription = doc.getElementsByAttributeValue("name", "description").first();
+            var description =  elementDescription != null ? elementDescription.attr("content") : null;
+            var createdAt = Timestamp.valueOf(LocalDateTime.now());
+            var urlCheck = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
+            UrlCheckRepository.save(urlCheck);
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
+            ctx.redirect(NamedRoutes.urlPath(urlId));
+        } catch (UnirestException e) {
+            ctx.sessionAttribute("flash", "Некорректный адрес");
+            ctx.redirect(NamedRoutes.urlPath(urlId));
+        }
+    }
 
 
 //    public static void build(Context ctx) {
