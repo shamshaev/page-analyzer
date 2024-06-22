@@ -11,10 +11,6 @@ public class UrlCheck {
     private String description;
     private Timestamp createdAt;
 
-    public UrlCheck() {
-
-    }
-
     public UrlCheck(Long urlId, Integer statusCode, String title, String h1, String description, Timestamp createdAt) {
         this.urlId = urlId;
         this.statusCode = statusCode;

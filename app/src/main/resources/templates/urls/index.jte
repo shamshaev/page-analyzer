@@ -10,12 +10,12 @@
             <p class="h1 mb-3">Сайты</p>
             <table class="table table-bordered text-dark table-hover">
                 <thead>
-                <tr>
-                    <th class="col-1">ID</th>
-                    <th class="col-8">Имя</th>
-                    <th class="col-2">Последняя проверка</th>
-                    <th class="col-1">Код ответа</th>
-                </tr>
+                    <tr>
+                        <th scope="col" class="col-1">ID</th>
+                        <th scope="col" class="col-8">Имя</th>
+                        <th scope="col" class="col-2">Последняя проверка</th>
+                        <th scope="col" class="col-1">Код ответа</th>
+                    </tr>
                 </thead>
                 <tbody>
                 @for(var url : page.getUrls())

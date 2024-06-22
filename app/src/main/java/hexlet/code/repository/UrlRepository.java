@@ -60,13 +60,13 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
-    public static boolean isDuplicate(String name) throws SQLException {
+    public static boolean isUnique(String name) throws SQLException {
         var sql = "SELECT * FROM urls WHERE name = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name);
             var resultSet = stmt.executeQuery();
-            return resultSet.isBeforeFirst();
+            return !resultSet.isBeforeFirst();
         }
     }
 }
