@@ -9,7 +9,7 @@ It's the web application for simple SEO analysis of web sites. The application i
 
 ![screenshot_1](screenshots/screenshot_1.png?raw=true)
 
-You can input any absolute URL (including a port number is necessary) for analysis.
+You can input any absolute URL (including a port number if necessary) for analysis.
 
 ![screenshot_2](screenshots/screenshot_2.png?raw=true)
 
