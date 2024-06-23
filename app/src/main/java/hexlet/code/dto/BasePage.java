@@ -3,11 +3,11 @@ package hexlet.code.dto;
 public class BasePage {
     private String flash;
 
-    public String getFlash() {
+    public final String getFlash() {
         return flash;
     }
 
-    public void setFlash(String flash) {
+    public final void setFlash(String flash) {
         this.flash = flash;
     }
 
