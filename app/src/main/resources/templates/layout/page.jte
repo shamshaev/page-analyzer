@@ -1,4 +1,5 @@
 @import hexlet.code.util.NamedRoutes
+@import hexlet.code.util.Utils
 @import hexlet.code.dto.BasePage
 @import gg.jte.Content
 @param Content content
@@ -35,7 +36,7 @@
     </header>
 
     @if(page != null && page.getFlash() != null)
-      <div class="alert alert-${BasePage.getType(page.getFlash())} alert-dismissible mb-0" role="alert">
+      <div class="alert alert-${Utils.getFlashType(page.getFlash())} alert-dismissible mb-0" role="alert">
         ${page.getFlash()}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>

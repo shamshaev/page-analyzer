@@ -10,14 +10,4 @@ public class BasePage {
     public final void setFlash(String flash) {
         this.flash = flash;
     }
-
-    public static String getType(String flash) throws RuntimeException {
-        return switch (flash) {
-            case "Страница успешно добавлена", "Страница успешно проверена" -> "success";
-            case "Некорректный URL", "Некорректный адрес" -> "danger";
-            case "Страница уже существует" -> "info";
-            default -> throw new RuntimeException("Unknown alert: '" + flash + "'");
-        };
-    }
-
 }

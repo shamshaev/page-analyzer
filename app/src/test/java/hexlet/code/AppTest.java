@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 class AppTest {
     Javalin app;
@@ -69,20 +68,16 @@ class AppTest {
 
     @Test
     public void testUrlsPage() throws SQLException {
-        var url = new Url("https://www.sports.ru", Timestamp.valueOf("2024-06-19 15:06:22"));
+        var url = new Url("https://www.sports.ru");
         UrlRepository.save(url);
 
-        var urlCheck1 = new UrlCheck(url.getId(), 200, "Спорт", "Новости спорта",
-                "Все самое интересное", Timestamp.valueOf("2024-06-19 15:06:22"));
-        var urlCheck2 = new UrlCheck(url.getId(), 200, "Спорт", "Новости спорта",
-                "Все самое интересное", Timestamp.valueOf("2024-06-19 18:09:42"));
-        UrlCheckRepository.save(urlCheck1);
-        UrlCheckRepository.save(urlCheck2);
+        var urlCheck = new UrlCheck(url.getId(), 200, "Спорт", "Новости спорта", "Все самое интересное");
+        UrlCheckRepository.save(urlCheck);
 
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls");
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("https://www.sports.ru", "19/06/2024 18:09");
+            assertThat(response.body().string()).contains("https://www.sports.ru", "200");
         });
     }
 
@@ -99,20 +94,20 @@ class AppTest {
 
     @Test
     public void testShowUrl() throws SQLException {
-        var url = new Url("https://www.example.com", Timestamp.valueOf("2024-06-20 12:06:22"));
+        var url = new Url("https://www.example.com");
         UrlRepository.save(url);
 
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/" + url.getId());
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("Сайт: https://www.example.com", "20/06/2024 12:06");
+            assertThat(response.body().string()).contains("Сайт: https://www.example.com");
         });
     }
 
     @Test
     public void testCheckUrl() throws SQLException {
         var name = mockServer.url("/").toString();
-        var url = new Url(name, Timestamp.valueOf("2024-06-19 12:06:22"));
+        var url = new Url(name);
         UrlRepository.save(url);
 
         JavalinTest.test(app, (server, client) -> {

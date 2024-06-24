@@ -4,6 +4,8 @@ import hexlet.code.model.Url;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +16,7 @@ public class UrlRepository extends BaseRepository {
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, url.getName());
-            preparedStatement.setTimestamp(2, url.getCreatedAt());
+            preparedStatement.setTimestamp(2, Timestamp.from(Instant.now()));
             preparedStatement.executeUpdate();
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -33,9 +35,10 @@ public class UrlRepository extends BaseRepository {
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getTimestamp("created_at");
-                var url = new Url(name, createdAt);
+                var createdAt = resultSet.getTimestamp("created_at").toInstant();
+                var url = new Url(name);
                 url.setId(id);
+                url.setCreatedAt(createdAt);
                 return Optional.of(url);
             }
             return Optional.empty();
@@ -51,9 +54,10 @@ public class UrlRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getTimestamp("created_at");
-                var url = new Url(name, createdAt);
+                var createdAt = resultSet.getTimestamp("created_at").toInstant();
+                var url = new Url(name);
                 url.setId(id);
+                url.setCreatedAt(createdAt);
                 result.add(url);
             }
             return result;

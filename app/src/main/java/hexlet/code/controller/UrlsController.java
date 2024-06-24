@@ -19,8 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
@@ -43,8 +41,7 @@ public class UrlsController {
             var name = validatedName.getProtocol() + "://" + validatedName.getHost() + port;
 
             if (UrlRepository.isUnique(name)) {
-                var createdAt = Timestamp.from(Instant.now());
-                var url = new Url(name, createdAt);
+                var url = new Url(name);
                 UrlRepository.save(url);
 
                 ctx.sessionAttribute("flash", "Страница успешно добавлена");
@@ -88,9 +85,7 @@ public class UrlsController {
             var elementDescription = doc.getElementsByAttributeValue("name", "description").first();
             var description =  elementDescription != null ? elementDescription.attr("content") : null;
 
-            var createdAt = Timestamp.from(Instant.now());
-
-            var urlCheck = new UrlCheck(urlId, statusCode, title, h1, description, createdAt);
+            var urlCheck = new UrlCheck(urlId, statusCode, title, h1, description);
             UrlCheckRepository.save(urlCheck);
 
             ctx.sessionAttribute("flash", "Страница успешно проверена");

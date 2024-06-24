@@ -1,30 +1,33 @@
 package hexlet.code.model;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 public final class Url {
     private Long id;
     private String name;
-    private Timestamp createdAt;
+    private Instant createdAt;
 
-    public Url(String name, Timestamp createdAt) {
+    public Url(String name) {
         this.name = name;
-        this.createdAt = createdAt;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
-    public Timestamp getCreatedAt() {
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getCreatedAt() {
         return createdAt;
     }
 }
