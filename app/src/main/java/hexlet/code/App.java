@@ -30,11 +30,10 @@ public class App {
     }
 
     private static String getSql(String jdbcUrl) {
-        var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
-        var sql = new BufferedReader(new InputStreamReader(url))
+        var schema = jdbcUrl.contains("h2") ? "schemaH2.sql" : "schemaPostgres.sql";
+        var url = App.class.getClassLoader().getResourceAsStream("schemas/" + schema);
+        return new BufferedReader(new InputStreamReader(url))
                 .lines().collect(Collectors.joining("\n"));
-
-        return jdbcUrl.contains("h2") ? sql : sql.replace("AUTO_INCREMENT", "GENERATED ALWAYS AS IDENTITY");
     }
 
     private static TemplateEngine createTemplateEngine() {
