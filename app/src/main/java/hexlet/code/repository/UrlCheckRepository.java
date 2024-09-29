@@ -6,8 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +39,7 @@ public class UrlCheckRepository extends BaseRepository {
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, urlId);
             var resultSet = stmt.executeQuery();
-            var result = new ArrayList<UrlCheck>();
+            var result = new LinkedList<UrlCheck>();
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var statusCode = resultSet.getInt("status_code");
